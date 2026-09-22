@@ -125,9 +125,6 @@ APT_PACKAGES=(
     age
     pass
 
-    # Compression / JSON / YAML
-    yq
-
     # Process / système
     procps
     psmisc
@@ -153,6 +150,7 @@ APT_PACKAGES=(
 INSTALL_ZOXIDE=true
 INSTALL_EZA=true
 INSTALL_DELTA=true
+INSTALL_YQ=true   # binaire mikefarah/yq — absent des dépôts APT Ubuntu jammy
 
 # DevOps
 INSTALL_DOCKER_CLI=false   # pas de daemon systemd dans Kasm — CLI seule, utile si DOCKER_HOST distant
@@ -838,6 +836,14 @@ install_modern_cli() {
         fi
     fi
 
+    if [[ "$INSTALL_YQ" == true ]] && ! command -v yq >/dev/null 2>&1; then
+        log "Installation de yq..."
+        curl -fsSL \
+            "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_$(dpkg --print-architecture)" \
+            -o /usr/local/bin/yq
+        chmod 0755 /usr/local/bin/yq
+    fi
+
     success "CLI modernes traitées."
 }
 
@@ -850,7 +856,7 @@ validate_installation() {
     section "Validation"
 
     local commands=(
-        zsh git curl jq rg fzf kubectl helm terraform ansible
+        zsh git curl jq yq rg fzf kubectl helm terraform ansible
     )
 
     local failed=0
